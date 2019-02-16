@@ -14,3 +14,22 @@ import Turbolinks from 'turbolinks'
 Turbolinks.start()
 
 import 'stylesheets/application'
+
+document.addEventListener('turbolinks:load', (event) => {
+  const forms = document.querySelectorAll('form[data-remote="true"]')
+  forms.forEach((form) => {
+    form.addEventListener('ajax:error', (event) => {
+      const detail = event.detail
+      const xhr = detail[2]
+      const contentType = xhr.getResponseHeader('content-type')
+
+      if (contentType === 'text/html; charset=utf-8') {
+        const target = event.currentTarget
+        const tmp = document.createElement('div')
+        tmp.innerHTML = xhr.responseText
+        const element = tmp.firstElementChild
+        target.innerHTML = element.innerHTML
+      }
+    })
+  })
+})
